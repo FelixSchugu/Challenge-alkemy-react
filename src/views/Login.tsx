@@ -3,11 +3,22 @@ import React from "react";
 import FormInput from "../components/atoms/FormInput";
 import { Formik, Form } from "formik";
 import { loginValidationSchema } from "../helpers/formValidations/loginValidations";
+import { useDispatch, useSelector } from "react-redux";
+import { UserAuthActions } from "../store/actions/auth";
+import { AuthRootState } from "../store/types";
 
 const Login: React.FC = () => {
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+  const dispatch = useDispatch();
+  const isAuth = useSelector(
+    (state: AuthRootState) => state.authReducer.isAuth
+  );
+  const isLoading = useSelector(
+    (state: AuthRootState) => state.authReducer.isLoading
+  );
 
-    
+  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+    dispatch(UserAuthActions.authUser(values));
+    console.log(isLoading);
   };
 
   return (
@@ -24,15 +35,7 @@ const Login: React.FC = () => {
         validateOnChange={false}
         validateOnBlur={false}
         validationSchema={loginValidationSchema}
-        render={({
-          handleChange,
-          handleSubmit,
-          handleBlur,
-          values,
-          errors,
-          touched,
-          isValid,
-        }) => (
+        render={({ handleChange, values, errors, touched }) => (
           <Form
             className="d-flex justify-content-center align-items-center flex-column bg-white border p-4 shadow-sm"
             style={{ width: "350px" }}
@@ -64,6 +67,8 @@ const Login: React.FC = () => {
             {errors.password && touched.password ? (
               <div className="text-danger mb-3">{errors.password}</div>
             ) : null}
+
+            {isLoading && <div className="mb-3">{"Cargando..."}</div>}
 
             <Button
               type="submit"

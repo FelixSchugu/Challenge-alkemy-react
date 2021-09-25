@@ -6,15 +6,22 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
+import Home from "./views/Home";
+import Styles from "./styles/Styles";
 
 function App() {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/login" component={Login} />
-        <Redirect from="*" to="/login" />
-      </Switch>
-    </Router>
+    <>
+      <Router>
+        <Switch>
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/home" component={Home} />
+          <Redirect from="*" to="/login" />
+        </Switch>
+      </Router>
+
+      <Styles />
+    </>
   );
 }
 
