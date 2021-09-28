@@ -22,7 +22,7 @@ export const searchHero = async (name: string) => {
   try {
     const response = await heroDataInstance.request({
       method: "GET",
-      url: `${token}/search/${name}`,
+      url: `${token}/search/${name}/`,
     });
     return response;
   } catch (error) {

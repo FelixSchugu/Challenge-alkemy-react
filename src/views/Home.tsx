@@ -88,6 +88,10 @@ const Home = () => {
       setSearchingIsLoading(false);
     } catch (error) {
       setSearchingIsLoading(false);
+      setAddNotAllowed({
+        error: true,
+        message: "CORS",
+      })
     }
   };
 

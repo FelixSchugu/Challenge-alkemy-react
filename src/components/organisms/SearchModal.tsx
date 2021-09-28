@@ -103,6 +103,20 @@ const SearchModal: React.FC<SearchModalTypes> = (props) => {
           {props.addError.error && (
             <p className="text-danger">{props.addError.message}</p>
           )}
+
+          {props.addError.error && props.addError.message === "CORS" && (
+            <p className="text-danger">
+              Error de red, si es debido al cors puede solucionarlo bajando esta
+              extension. <br />
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino"
+              >
+                Cors Unblock (Google Chrome)
+              </a>
+            </p>
+          )}
         </>
       }
       modalfooter={
