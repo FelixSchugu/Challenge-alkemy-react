@@ -26,7 +26,7 @@ const FormInput: React.FC<FormInputType> = (props) => {
         onChange={props.onChange}
       />
       {props.isInvalid && !!props.errorText && (
-        <Form.Text>{props.errorText}</Form.Text>
+        <Form.Text className="text-danger mt-1">{props.errorText}</Form.Text>
       )}
     </Form.Group>
   );

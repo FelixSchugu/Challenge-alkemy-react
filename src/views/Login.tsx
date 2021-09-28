@@ -6,8 +6,11 @@ import { loginValidationSchema } from "../helpers/formValidations/loginValidatio
 import { useDispatch, useSelector } from "react-redux";
 import { UserAuthActions } from "../store/actions/auth";
 import { AuthRootState } from "../store/types";
+import { useHistory } from "react-router";
 
 const Login: React.FC = () => {
+  const history = useHistory();
+
   const dispatch = useDispatch();
   const isAuth = useSelector(
     (state: AuthRootState) => state.authReducer.isAuth
@@ -16,9 +19,18 @@ const Login: React.FC = () => {
     (state: AuthRootState) => state.authReducer.isLoading
   );
 
+  const error = useSelector((state: AuthRootState) => state.authReducer.error);
+  const errorMessage = useSelector(
+    (state: AuthRootState) => state.authReducer.errorMessage
+  );
+
   const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
     dispatch(UserAuthActions.authUser(values));
     console.log(isLoading);
+
+    if (isAuth) {
+      history.replace("/home");
+    }
   };
 
   return (
@@ -69,6 +81,7 @@ const Login: React.FC = () => {
             ) : null}
 
             {isLoading && <div className="mb-3">{"Cargando..."}</div>}
+            {error && !isLoading && <div className="text-danger">{errorMessage}</div>}
 
             <Button
               type="submit"

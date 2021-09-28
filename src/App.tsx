@@ -8,15 +8,37 @@ import {
 } from "react-router-dom";
 import Home from "./views/Home";
 import Styles from "./styles/Styles";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { LocalStorageKeys, getItem } from "./helpers/localStorage/index";
+import { AuthRootState } from "./store/types";
+import { UserAuthActions } from "./store/actions/auth";
 
 function App() {
+  const isAuth = useSelector(
+    (state: AuthRootState) => state.authReducer.isAuth
+  );
+
+  const dispatch = useDispatch();
+
+  const initializeApp = async () => {
+    const token = await JSON.parse(getItem(LocalStorageKeys.TOKEN));
+
+    if (token) {
+      dispatch(UserAuthActions.authWithToken());
+    }
+  };
+  useEffect(() => {
+    initializeApp();
+  });
+
   return (
     <>
       <Router>
         <Switch>
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/home" component={Home} />
-          <Redirect from="*" to="/login" />
+          {!isAuth && <Route exact path="/login" component={Login} />}
+          {isAuth && <Route exact path="/home" component={Home} />}
+          <Redirect from="*" to={!isAuth ? "/login" : "/home"} />
         </Switch>
       </Router>
 

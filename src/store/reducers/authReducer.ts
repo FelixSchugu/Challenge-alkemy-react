@@ -19,7 +19,7 @@ export const authReducer = (
     case Types.LOGIN_SUCCESSFULLY:
       return {
         error: false,
-        isAuth: true, 
+        isAuth: true,
         isLoading: false,
         errorMessage: "",
         token: saveItem(LocalStorageKeys.TOKEN, action.token),
@@ -28,6 +28,8 @@ export const authReducer = (
       return {
         ...state,
         isLoading: true,
+        error: false,
+        errorMessage: "",
       };
 
     case Types.LOGIN_FAILED:
@@ -43,6 +45,12 @@ export const authReducer = (
         ...state,
         isAuth: false,
         token: deleteItem(LocalStorageKeys.TOKEN),
+      };
+
+    case Types.LOGIN_WITH_TOKEN:
+      return {
+        ...state,
+        isAuth: true,
       };
 
     case Types.LOGIN_DISABLE_ERRORS:

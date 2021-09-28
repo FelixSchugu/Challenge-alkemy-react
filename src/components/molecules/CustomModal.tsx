@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react";
 import { Modal } from "react-bootstrap";
-import { JsxChild } from "typescript";
 
 type ModalTypes = {
   modaltitle: string;

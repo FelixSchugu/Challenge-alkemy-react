@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { searchHero } from "../helpers/serverRequests";
 import { FetchResponseType } from "../store/types";
 import Navbar from "../components/molecules/Navbar";
@@ -8,30 +8,45 @@ import { HeroType } from "./types";
 import SearchModal from "../components/organisms/SearchModal";
 import DeleteModal from "../components/organisms/DeleteModal";
 import HeroDetailsModal from "../components/organisms/HeroDetailsModal";
+import { useDispatch } from "react-redux";
+import {
+  clearLocalStorage,
+  getItem,
+  LocalStorageKeys,
+  saveItem,
+} from "../helpers/localStorage";
+import { UserAuthActions } from "../store/actions/auth";
+import { useHistory } from "react-router";
+import { getRandomNumWithRange } from "../helpers/random";
 
 // const sampleMap = ["Perro", "Perro", "Perro", "Perro", "Perro", "Perro"];
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  // Heroes grid
   const [heroesTeam, setHeroesTeam] = useState<HeroType[]>([]);
 
   // Search modal //
-  const [openSearchModal, setOpenSearchModal] = useState<boolean>(false);
+  const [openSearchModal, setOpenSearchModal] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [disableSearchBtn, setDisableSearchBtn] = useState<boolean>(true);
-  const [searchNoResults, setSearchNoResults] = useState<boolean>(false);
-  const [searchingIsLoading, setSearchingIsLoading] = useState<boolean>(false);
-  const searchHeroRef = useRef<HTMLInputElement>(null);
+  const [searchNoResults, setSearchNoResults] = useState(false);
+  const [searchingIsLoading, setSearchingIsLoading] = useState(false);
 
-  const [unMatchTeamError, setUnMatchTeamError] = useState({
-    error: false,
-    message: "",
-  });
+  const [addNotAllowed, setAddNotAllowed] = useState<{
+    error: boolean;
+    message: string;
+  }>({ error: false, message: "" });
 
   ///
 
   // Delete modal
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-  const [heroIndexToDelete, setHeroIndexToDelete] = useState<number>(0);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [heroIndexToDelete, setHeroIndexToDelete] = useState(0);
+  const [heroNameToDelete, setHeroNameToDelete] = useState<string | undefined>(
+    ""
+  );
   ///
 
   // Details modal
@@ -39,32 +54,29 @@ const Home = () => {
   const [heroDetails, setHeroDetails] = useState<HeroType>({});
   ///
 
-  const searchHeroByName = async () => {
-    try {
-      const response = (await searchHero("venom")!) as FetchResponseType;
-
-      if (response.status === 200) {
-        setHeroesTeam(response.data);
-        console.log(response.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    //searchHeroByName();
-    
+    const storageData = JSON.parse(getItem(LocalStorageKeys.HEROES_INFO));
+
+    if (storageData) {
+      setHeroesTeam(storageData.data);
+    }
   }, []);
 
-  const handleSearchHero = async () => {
-    const searchValue = searchHeroRef!.current!.value;
+  const handleOpenSearchModal = () => {
+    setAddNotAllowed({
+      error: false,
+      message: "",
+    });
+    setOpenSearchModal(true);
+  };
+
+  const handleSearchHero = async (value: { searchValue: string }) => {
+    const searchValue = value.searchValue;
     setSearchResults([]);
     setSearchNoResults(false);
     setSearchingIsLoading(true);
     try {
       const response = (await searchHero(searchValue)!) as FetchResponseType;
-      console.log(response.data);
       if (response.status === 200 && response.data.response === "success") {
         const results = response.data.results;
         setSearchResults(results);
@@ -83,28 +95,115 @@ const Home = () => {
     event: React.MouseEvent<HTMLElement>,
     hero: HeroType
   ) => {
-    let badHeroes = 0
-    let godHeroes = 0
+    setAddNotAllowed({
+      error: false,
+      message: "",
+    });
 
-    
+    if (heroesTeam.some((elem) => elem.id === hero.id)) {
+      setAddNotAllowed({
+        error: true,
+        message: "Este heroe ya está en tu equipo",
+      });
+      return;
+    }
 
-    setHeroesTeam((prevState) => [...prevState, hero]);
+    if (heroesTeam.length >= 6) {
+      setAddNotAllowed({
+        error: true,
+        message: "Solo puedes tener 6 heroes en tu equipo",
+      });
+      return;
+    }
+
+    const tempData = hero;
+
+    for (const elem in tempData.powerstats) {
+      if (tempData.powerstats[elem] === "null") {
+        tempData.powerstats[elem] = String(getRandomNumWithRange(20, 100));
+      }
+    }
+
+    if (tempData.biography?.alignment === "-") {
+      tempData.biography.alignment = "good";
+    }
+
+    let badHeroes = 0;
+    let goodHeroes = 0;
+
+    heroesTeam.forEach((elem) => {
+      if (elem.biography?.alignment === "good") {
+        ++goodHeroes;
+      }
+
+      if (elem.biography?.alignment === "bad") {
+        ++badHeroes;
+      }
+    });
+
+    if (hero.biography?.alignment === "good" && goodHeroes >= 3) {
+      setAddNotAllowed({
+        error: true,
+        message: "Solo puedes tener 3 heroes buenos en tu equipo",
+      });
+      return;
+    }
+
+    if (hero.biography?.alignment === "bad" && badHeroes >= 3) {
+      setAddNotAllowed({
+        error: true,
+        message: "Solo puedes tener 3 villanos en tu equipo",
+      });
+      return;
+    }
+
+    if (
+      tempData.appearance?.weight[1] === "-" ||
+      tempData.appearance?.weight[1] === "0 kg"
+    ) {
+      const newWeight = `${getRandomNumWithRange(50, 80)} kg`;
+      tempData.appearance.weight[1] = newWeight;
+    }
+
+    if (
+      tempData.appearance?.height[1] === "-" ||
+      tempData.appearance?.height[1] === "0 cm"
+    ) {
+      const newHeight = `${getRandomNumWithRange(150, 190)} cm`;
+      tempData.appearance.height[1] = newHeight;
+    }
+
+    const storageData = { data: [...heroesTeam, tempData] };
+    saveItem(LocalStorageKeys.HEROES_INFO, storageData);
+    setHeroesTeam((prevState) => [...prevState, tempData]);
   };
-
-  const handleViewDetails = (index: number) => {};
 
   const handleDeleteHero = (index: number) => {
     const tempArray = [...heroesTeam];
     tempArray.splice(index, 1);
+
+    const storageData = { data: tempArray };
+
+    saveItem(LocalStorageKeys.HEROES_INFO, storageData);
     setHeroesTeam(tempArray);
+
+    setAddNotAllowed({
+      error: false,
+      message: "",
+    });
+
     setOpenDeleteModal(false);
   };
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    clearLocalStorage();
+    dispatch(UserAuthActions.logout());
+    history.replace("/login");
+  };
 
   return (
     <div
-      className="vw-100 vh-100"
+      className="d-flex flex-column vw-100 vh-100"
       style={{
         backgroundColor: "rgba(0, 0, 0, 0.05)",
         boxSizing: "border-box",
@@ -112,8 +211,9 @@ const Home = () => {
       }}
     >
       <Navbar
-        onOpenSearchModal={() => setOpenSearchModal(true)}
+        onOpenSearchModal={handleOpenSearchModal}
         onLogout={handleLogout}
+        heroData={heroesTeam}
       />
       <Container
         fluid
@@ -137,11 +237,14 @@ const Home = () => {
                 }}
                 onDeleteHero={() => {
                   setHeroIndexToDelete(index);
+                  setHeroNameToDelete(heroe.name);
                   setOpenDeleteModal(true);
                 }}
                 imageSrc={heroe.image?.url}
                 heroName={heroe.name}
                 powerstats={heroe.powerstats}
+                orientation={heroe.biography?.alignment}
+                key={`hero${heroe.id}`}
               />
             </Col>
           ))}
@@ -150,24 +253,20 @@ const Home = () => {
 
       <SearchModal
         searchingIsLoading={searchingIsLoading}
-        disableSearchBtn={disableSearchBtn}
         openSearchModal={openSearchModal}
         onHide={() => setOpenSearchModal(false)}
         onSearchHero={handleSearchHero}
-        searchHeroRef={searchHeroRef}
         onAddHero={handleAddHero}
-        onSearchInputChange={() => {
-          const searchRef = searchHeroRef.current?.value;
-          setDisableSearchBtn(!searchRef);
-        }}
         searchNoResults={searchNoResults}
         searchResults={searchResults}
+        addError={addNotAllowed}
       />
 
       <DeleteModal
         show={openDeleteModal}
         onHide={() => setOpenDeleteModal(false)}
         onDeleteHeroe={() => handleDeleteHero(heroIndexToDelete)}
+        heroName={heroNameToDelete as string}
       />
 
       <HeroDetailsModal

@@ -7,6 +7,7 @@ type CardType = {
   imageSrc?: string;
   heroName?: string;
   powerstats?: PowerStatsType;
+  orientation?: string;
   onViewDetails: () => void;
   onDeleteHero: () => void;
 };
@@ -18,7 +19,16 @@ const HeroCard: React.FC<CardType> = (props) => {
     <Card className="shadow-sm" style={{ width: "100%", margin: "10px" }}>
       <Card.Img height="300px" variant="top" src={props.imageSrc} />
       <Card.Body>
-        <Card.Title>{props.heroName}</Card.Title>
+        <div className="w-100 d-flex flex-row align-items-center justify-content-start">
+          <Card.Title className="text-truncate" >{props.heroName}</Card.Title>
+          <h6
+            className={`${
+              props.orientation === "bad" ? "text-danger" : "text-success"
+            } mx-4`}
+          >
+            {props.orientation === "bad" ? "Villano" : "Heroe"}
+          </h6>
+        </div>
 
         <ListGroup variant="flush" style={{ fontSize: "14px" }}>
           <ListGroup.Item>

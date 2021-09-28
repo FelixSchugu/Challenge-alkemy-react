@@ -6,6 +6,7 @@ type DeleteModalTypes = {
   onHide: () => void;
   show: boolean;
   onDeleteHeroe: () => void;
+  heroName: string;
 };
 
 const DeleteModal: React.FC<DeleteModalTypes> = (props) => {
@@ -14,7 +15,7 @@ const DeleteModal: React.FC<DeleteModalTypes> = (props) => {
       show={props.show}
       modaltitle={"Eliminar heroe"}
       modalbody={
-        <p>¿Está seguro que desea eliminar este heroe de tu equipo?</p>
+        <p>{`¿Está seguro que desea eliminar a ${props.heroName} de tu equipo?`}</p>
       }
       modalfooter={
         <>

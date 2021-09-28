@@ -21,10 +21,10 @@ const HeroDetailsModal: React.FC<HeroDetailsModalsTypes> = (props) => {
           <Modal.Title>{heroData.name}</Modal.Title>
           <ListGroup variant="flush">
             <ListGroup.Item>
-              Peso: {heroData.appearance?.weight[0]}
+              Peso: {heroData.appearance?.weight[1]}
             </ListGroup.Item>
             <ListGroup.Item>
-              Altura: {heroData.appearance?.height[0]}
+              Altura: {heroData.appearance?.height[1]}
             </ListGroup.Item>
             <ListGroup.Item>
               Nombre Completo: {heroData.biography?.["full-name"]}

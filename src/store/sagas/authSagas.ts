@@ -16,13 +16,13 @@ function* fetchingUserData(action: any) {
     } else {
       yield put({
         type: Types.LOGIN_FAILED,
-        error: "Credenciales incorrectas",
+        error: "Datos incorrectos",
       });
     }
   } catch (error) {
     yield put({
       type: Types.LOGIN_FAILED,
-      error: "Error interno del servidor",
+      error: "Datos incorrectos",
     });
   }
 }

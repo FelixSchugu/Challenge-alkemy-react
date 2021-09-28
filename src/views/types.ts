@@ -17,13 +17,13 @@ type AppearanceType = {
   "hair-color": string;
 };
 
- export type PowerStatsType = {
-  intelligence?: string;
-  strength?: string;
-  speed?: string;
-  durability?: string;
-  power?: string;
-  combat?: string;
+export type PowerStatsType = {
+  [intelligence: string]: string;
+  strength: string;
+  speed: string;
+  durability: string;
+  power: string; 
+  combat: string;
 };
 
 type WorkType = {

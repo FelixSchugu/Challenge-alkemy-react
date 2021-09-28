@@ -1,20 +1,20 @@
-import React, { MutableRefObject } from "react";
+import React from "react";
 import CustomModal from "../molecules/CustomModal";
 import FormInput from "../atoms/FormInput";
 import { Button, Container, Row, Col, Image } from "react-bootstrap";
 import { HeroType } from "../../views/types";
+import { Form, Formik } from "formik";
+import { searchValidationSchema } from "../../helpers/formValidations/searchValidations";
 
 type SearchModalTypes = {
   openSearchModal: boolean;
-  searchHeroRef: MutableRefObject<HTMLInputElement | null>;
   searchingIsLoading: boolean;
-  disableSearchBtn: boolean;
-  onSearchInputChange: () => void;
-  onSearchHero: () => void;
+  onSearchHero: (values: { searchValue: string }) => void;
   searchResults: any[];
   searchNoResults: boolean;
   onAddHero: (event: React.MouseEvent<HTMLElement>, hero: HeroType) => void;
   onHide: () => void;
+  addError: { message: string; error: boolean };
 };
 
 const SearchModal: React.FC<SearchModalTypes> = (props) => {
@@ -24,25 +24,35 @@ const SearchModal: React.FC<SearchModalTypes> = (props) => {
       modaltitle={"Buscar heroes"}
       modalbody={
         <>
-          <FormInput
-            inputRef={props.searchHeroRef}
-            type="text"
-            label="Ingrese el nombre del heroe a buscar"
-            onChange={props.onSearchInputChange}
+          <Formik
+            initialValues={{ searchValue: "" }}
+            onSubmit={props.searchingIsLoading ? () => {} : props.onSearchHero}
+            validateOnChange={false}
+            validateOnBlur={false}
+            validationSchema={searchValidationSchema}
+            render={({ handleChange, values, errors, touched }) => (
+              <Form>
+                <FormInput
+                  type="text"
+                  name="searchValue"
+                  label="Ingrese el nombre del heroe a buscar"
+                  onChange={handleChange}
+                  value={values.searchValue}
+                  isInvalid={!!errors.searchValue && !!touched.searchValue}
+                  errorText={errors.searchValue}
+                />
+                <Button type="submit" variant="primary">
+                  {props.searchingIsLoading ? "Buscando heroes..." : "Buscar"}
+                </Button>
+              </Form>
+            )}
           />
-          <Button
-            onClick={props.searchingIsLoading ? () => {} : props.onSearchHero}
-            variant="primary"
-            disabled={props.disableSearchBtn}
-          >
-            {props.searchingIsLoading ? "Buscando heroes..." : "Buscar"}
-          </Button>
           {props.searchResults.length > 0 && (
             <h4 className="mt-2">Resultados: </h4>
           )}
           <Container
             className="mt-2 border"
-            style={{ maxHeight: "50vh", overflowX: "auto" }}
+            style={{ maxHeight: "45vh", overflowX: "auto" }}
           >
             {props.searchNoResults && (
               <div className="w-100">
@@ -55,6 +65,7 @@ const SearchModal: React.FC<SearchModalTypes> = (props) => {
               <Row
                 className="w-100 "
                 style={{ height: "50px", margin: "10px 0px" }}
+                key={`result${result.id}${result.name}`}
               >
                 <Col
                   className="d-flex bg-white flex-row align-items-center justify-content-start shadow-sm"
@@ -74,17 +85,24 @@ const SearchModal: React.FC<SearchModalTypes> = (props) => {
                     variant="secondary"
                     onClick={(event) => props.onAddHero(event, result)}
                   >
-                    Agregar al equipo
+                    Agregar
                   </Button>
                 </Col>
               </Row>
             ))}
           </Container>
-          <p className="mt-2" >
-            *Los heroes que no tengan un bando o alineación definidas tendrán
-            la alineación buena por defecto. <br></br>
-            *Los heroes que no tengan stats (null) se le les asignará el valor 50.
+          <p className="mt-2">
+            *Los heroes que no tengan un bando o alineación definidas tendrán la
+            alineación buena por defecto. <br />
+            *Los heroes que no tengan stats (null) se le les asignará un valor
+            aleatorio entre 20 y 100. <br />
+            *Los heroes que no tengan un peso y altura definido de les asignará,
+            el valor aleatorio de entre 50kg y 80kg para el peso y entre 150cm y
+            190 cm para la altura.
           </p>
+          {props.addError.error && (
+            <p className="text-danger">{props.addError.message}</p>
+          )}
         </>
       }
       modalfooter={

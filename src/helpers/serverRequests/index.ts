@@ -1,5 +1,4 @@
 import axios from "axios";
-import { FetchResponseType } from "../../store/types";
 
 type UserType = {
   email: string;
