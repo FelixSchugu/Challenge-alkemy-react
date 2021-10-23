@@ -1,4 +1,4 @@
-import { Types } from "../actionsTypes";
+import { LoginEnumTypes } from "../actionsTypes";
 
 type UserType = {
   username: string;
@@ -7,11 +7,11 @@ type UserType = {
 
 export const UserAuthActions = {
   authUser: (user: UserType) => ({
-    type: Types.LOGIN_REQUESTED,
+    type: LoginEnumTypes.LOGIN_REQUESTED,
     payload: user,
   }),
-  authWithToken: () => ({ type: Types.LOGIN_WITH_TOKEN }),
-  logout: () => ({ type: Types.LOGOUT }),
-  disableErrors: () => ({ type: Types.LOGIN_DISABLE_ERRORS }),
+  authWithToken: () => ({ type: LoginEnumTypes.LOGIN_WITH_TOKEN }),
+  logout: () => ({ type: LoginEnumTypes.LOGOUT }),
+  disableErrors: () => ({ type: LoginEnumTypes.LOGIN_DISABLE_ERRORS }),
 };
 

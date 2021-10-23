@@ -1,5 +1,5 @@
 import { AuthStateType } from "../types";
-import { Types } from "../actionsTypes";
+import { LoginEnumTypes } from "../actionsTypes";
 import { deleteItem, saveItem } from "../../helpers/localStorage";
 import { LocalStorageKeys } from "../../helpers/localStorage";
 
@@ -16,7 +16,7 @@ export const authReducer = (
   action: any
 ): AuthStateType | undefined => {
   switch (action.type) {
-    case Types.LOGIN_SUCCESSFULLY:
+    case LoginEnumTypes.LOGIN_SUCCESSFULLY:
       return {
         error: false,
         isAuth: true,
@@ -24,7 +24,7 @@ export const authReducer = (
         errorMessage: "",
         token: saveItem(LocalStorageKeys.TOKEN, action.token),
       };
-    case Types.LOGIN_REQUESTED:
+    case LoginEnumTypes.LOGIN_REQUESTED:
       return {
         ...state,
         isLoading: true,
@@ -32,7 +32,7 @@ export const authReducer = (
         errorMessage: "",
       };
 
-    case Types.LOGIN_FAILED:
+    case LoginEnumTypes.LOGIN_FAILED:
       return {
         ...state,
         errorMessage: action.error,
@@ -40,20 +40,20 @@ export const authReducer = (
         error: true,
       };
 
-    case Types.LOGOUT:
+    case LoginEnumTypes.LOGOUT:
       return {
         ...state,
         isAuth: false,
         token: deleteItem(LocalStorageKeys.TOKEN),
       };
 
-    case Types.LOGIN_WITH_TOKEN:
+    case LoginEnumTypes.LOGIN_WITH_TOKEN:
       return {
         ...state,
         isAuth: true,
       };
 
-    case Types.LOGIN_DISABLE_ERRORS:
+    case LoginEnumTypes.LOGIN_DISABLE_ERRORS:
       return {
         ...state,
         error: false,
@@ -61,6 +61,6 @@ export const authReducer = (
       };
 
     default:
-      return state;
+      return state; 
   }
 };

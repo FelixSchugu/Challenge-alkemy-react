@@ -29,3 +29,9 @@ export const searchHero = async (name: string) => {
     return error;
   }
 };
+
+export const searchHeroesData = (value: string) =>
+  heroDataInstance.request({
+    method: "GET",
+    url: `${token}/search/${value}/`,
+  });

@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "@redux-saga/core/effects";
 import { authUser } from "../../helpers/serverRequests";
-import { Types } from "../actionsTypes";
+import { LoginEnumTypes } from "../actionsTypes";
 import { FetchResponseType } from "../types";
 
 function* fetchingUserData(action: any) {
@@ -10,23 +10,23 @@ function* fetchingUserData(action: any) {
 
     if (response.status === 200) {
       yield put({
-        type: Types.LOGIN_SUCCESSFULLY,
+        type: LoginEnumTypes.LOGIN_SUCCESSFULLY,
         token: response.data?.token,
       });
     } else {
       yield put({
-        type: Types.LOGIN_FAILED,
+        type: LoginEnumTypes.LOGIN_FAILED,
         error: "Datos incorrectos",
       });
     }
   } catch (error) {
     yield put({
-      type: Types.LOGIN_FAILED,
+      type: LoginEnumTypes.LOGIN_FAILED,
       error: "Datos incorrectos",
     });
   }
 }
 
 export function* authWatcher() {
-  yield takeEvery(Types.LOGIN_REQUESTED, fetchingUserData);
+  yield takeEvery(LoginEnumTypes.LOGIN_REQUESTED, fetchingUserData);
 }
