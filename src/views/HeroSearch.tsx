@@ -131,8 +131,12 @@ const HeroSearch = () => {
   return (
     <RootContainer>
       <Container
-        className="w-75 h-auto p-4 bg-white shadow-sm d-grid"
-        style={{ margin: "auto", border: "1px solid lightgray" }}
+        className="w-100 h-auto p-4 bg-white shadow-sm d-grid"
+        style={{
+          margin: "auto",
+          border: "1px solid lightgray",
+          maxWidth: "800px",
+        }}
       >
         <h2 className="mx-auto">Buscar Heroe</h2>
 

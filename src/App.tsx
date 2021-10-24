@@ -1,25 +1,24 @@
 import "./App.css";
-import Login from "./views/Login";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
-import Home from "./views/Home";
+import { useState } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import Styles from "./styles/Styles";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LocalStorageKeys, getItem } from "./helpers/localStorage/index";
 import { AuthRootState } from "./store/types";
 import { UserAuthActions } from "./store/actions/auth";
-import HeroDetails from "./views/HeroDetails";
-import HeroSearch from "./views/HeroSearch";
+
+import PrivateRoutes from "./routes/PrivateRoutes";
+import PublicRoutes from "./routes/PublicRoutes";
 
 function App() {
   const isAuth = useSelector(
     (state: AuthRootState) => state.authReducer.isAuth
   );
+
+  // Importante para que ande el router desde la barra de dirección del navegador
+  const [isLoading, setIsLoading] = useState(true);
+  //
 
   const dispatch = useDispatch();
 
@@ -28,22 +27,19 @@ function App() {
 
     if (token) {
       dispatch(UserAuthActions.authWithToken());
+      setIsLoading(false);
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     initializeApp();
-  });
+  }, []);
 
   return (
     <>
       <Router>
-        <Switch>
-          <Route exact path="/details/:heroId" component={HeroDetails} />
-          <Route exact path="/search" component={HeroSearch} />
-          {!isAuth && <Route exact path="/login" component={Login} />}
-          {isAuth && <Route exact path="/home" component={Home} />}
-          <Redirect from="*" to={!isAuth ? "/login" : "/home"} />
-        </Switch>
+        {isAuth && !isLoading && <PrivateRoutes />}
+        {!isAuth && !isLoading && <PublicRoutes />}
       </Router>
       <Styles />
     </>

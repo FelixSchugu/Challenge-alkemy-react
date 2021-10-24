@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { searchHero } from "../helpers/serverRequests";
-import { FetchResponseType, HeroesTeamRootType } from "../store/types";
+import { HeroesTeamRootType } from "../store/types";
 import Navbar from "../components/molecules/Navbar";
 import HeroCard from "../components/molecules/HeroCard";
 import { Col, Container, Row } from "react-bootstrap";
 import { HeroType } from "./types";
-import SearchModal from "../components/organisms/SearchModal";
 import DeleteModal from "../components/organisms/DeleteModal";
 import HeroDetailsModal from "../components/organisms/HeroDetailsModal";
 import { useDispatch } from "react-redux";
@@ -17,9 +15,9 @@ import {
 } from "../helpers/localStorage";
 import { UserAuthActions } from "../store/actions/auth";
 import { useHistory } from "react-router";
-import { getRandomNumWithRange } from "../helpers/random";
 import { useSelector } from "react-redux";
 import { HeroesTeamActions } from "../store/actions/heroesTeam";
+import RootContainer from "../components/layout/CustomContainer";
 
 // const sampleMap = ["Perro", "Perro", "Perro", "Perro", "Perro", "Perro"];
 
@@ -28,8 +26,6 @@ const Home = () => {
   const history = useHistory();
 
   // Heroes grid
-  const [heroesTeam, setHeroesTeam] = useState<HeroType[]>([]);
-
   const myTeam = useSelector(
     (state: HeroesTeamRootType) => state.heroTeamReducer.myTeam
   );
@@ -81,14 +77,7 @@ const Home = () => {
   };
 
   return (
-    <div
-      className="d-flex flex-column vw-100 vh-100"
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.05)",
-        boxSizing: "border-box",
-        overflowX: "auto",
-      }}
-    >
+    <RootContainer>
       <Navbar
         onOpenSearchModal={handleOpenSearchModal}
         onLogout={handleLogout}
@@ -112,7 +101,11 @@ const Home = () => {
               <HeroCard
                 onViewDetails={() => {
                   setHeroDetails(heroe);
-                  setOpenDetailsModal(true);
+                  history.push({
+                    pathname: `/details/${heroe.id}`,
+                    state: { heroe },
+                  });
+                  // setOpenDetailsModal(true);
                 }}
                 onDeleteHero={() => {
                   setHeroIndexToDelete(index);
@@ -142,7 +135,7 @@ const Home = () => {
         onHide={() => setOpenDetailsModal(false)}
         heroData={heroDetails}
       />
-    </div>
+    </RootContainer>
   );
 };
 
