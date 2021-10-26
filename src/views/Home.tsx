@@ -53,6 +53,7 @@ const Home = () => {
     if (storageData) {
       dispatch(HeroesTeamActions.modifyHero(storageData.data));
     }
+    //eslint-disable-next-line
   }, []);
 
   const handleOpenSearchModal = () => {

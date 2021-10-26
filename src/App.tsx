@@ -33,6 +33,8 @@ function App() {
   };
   useEffect(() => {
     initializeApp();
+  
+    //eslint-disable-next-line
   }, []);
 
   return (

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+// import { useParams } from "react-router";
 import RootContainer from "../components/layout/CustomContainer";
 import { Container, Row, Col, Button, ListGroup } from "react-bootstrap";
 import { useHistory, useLocation } from "react-router";
 import { HeroType } from "./types";
 
 const HeroDetails = () => {
-  const params = useParams();
+  // const params = useParams();
   const history = useHistory();
   const location = useLocation<any>();
 
