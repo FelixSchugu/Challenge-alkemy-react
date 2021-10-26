@@ -6,7 +6,6 @@ import { FetchResponseType } from "../types";
 function* fetchingUserData(action: any) {
   try {
     const response: FetchResponseType = yield call(authUser, action.payload);
-    console.log(response);
 
     if (response.status === 200) {
       yield put({

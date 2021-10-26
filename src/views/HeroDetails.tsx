@@ -14,10 +14,6 @@ const HeroDetails = () => {
   const [hasHeroData, setHasHeroData] = useState(false);
 
   useEffect(() => {
-    console.log(params);
-  }, [params]);
-
-  useEffect(() => {
     if (location?.state?.heroe) {
       setHeroData(location?.state?.heroe);
       setHasHeroData(true);

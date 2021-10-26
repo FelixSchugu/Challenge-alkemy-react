@@ -26,7 +26,6 @@ const Login: React.FC = () => {
 
   const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
     dispatch(UserAuthActions.authUser(values));
-    console.log(isLoading);
 
     if (isAuth) {
       history.replace("/home");

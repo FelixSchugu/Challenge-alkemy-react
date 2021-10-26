@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import RootContainer from "../components/layout/CustomContainer";
 import { Container, Row, Col } from "react-bootstrap";
 import { Formik, Form } from "formik";
@@ -15,6 +15,23 @@ import { getRandomNumWithRange } from "../helpers/random";
 import { LocalStorageKeys, saveItem } from "../helpers/localStorage";
 import { HeroesTeamActions } from "../store/actions/heroesTeam";
 
+const countOrientation = (team: HeroType[]) => {
+  let villain = 0;
+  let hero = 0;
+
+  team.forEach((elem) => {
+    if (elem.biography?.alignment === "good") {
+      hero++;
+    }
+
+    if (elem.biography?.alignment === "bad") {
+      villain++;
+    }
+  });
+
+  return `Héroes: ${hero}/3  Villanos: ${villain}/3`;
+};
+
 const HeroSearch = () => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -24,6 +41,8 @@ const HeroSearch = () => {
     message: "",
   });
 
+  const [successfulAdd, setSuccessfulAdd] = useState(false);
+
   const { isLoading, noResults, searchCoincidences } = useSelector(
     (state: SearchRootType) => state.searchHeroReducer
   );
@@ -32,29 +51,29 @@ const HeroSearch = () => {
     (state: HeroesTeamRootType) => state.heroTeamReducer.myTeam
   );
 
-  useEffect(() => {
-    console.log(myTeam);
-  }, [myTeam]);
-
   const handleSearch = (value: { searchValue: string }) => {
     dispatch(SearchHeroActions.searchHero(value.searchValue));
-  };
-
-  const handleAddHero = (event: any, hero: HeroType) => {
-    console.log(hero);
-
     setAddNotAllowed({
       error: false,
       message: "",
     });
+    setSuccessfulAdd(false);
+  };
 
-    if (myTeam.some((elem) => elem.id === hero.id)) {
-      setAddNotAllowed({
-        error: true,
-        message: "Este heroe ya está en tu equipo",
-      });
-      return;
-    }
+  const handleAddHero = (event: any, hero: HeroType) => {
+    setAddNotAllowed({
+      error: false,
+      message: "",
+    });
+    setSuccessfulAdd(false);
+
+     if (myTeam.some((elem) => elem.id === hero.id)) {
+       setAddNotAllowed({
+         error: true,
+         message: "Este heroe ya está en tu equipo",
+       });
+       return;
+     }
 
     if (myTeam.length >= 6) {
       setAddNotAllowed({
@@ -122,9 +141,9 @@ const HeroSearch = () => {
     }
 
     const newData = { data: [...myTeam, tempData] };
-    saveItem(LocalStorageKeys.HEROES_INFO, newData);
-    // setHeroesTeam((prevState) => [...prevState, tempData]);
 
+    saveItem(LocalStorageKeys.HEROES_INFO, newData);
+    setSuccessfulAdd(true);
     dispatch(HeroesTeamActions.modifyHero(newData.data));
   };
 
@@ -166,8 +185,17 @@ const HeroSearch = () => {
             )}
           </Formik>
         </Row>
+
+        <Row>
+          <p className="mt-1">
+            {`Personajes en tu equipo ${myTeam.length}/6. ${countOrientation(
+              myTeam
+            )} `}
+          </p>
+        </Row>
+
         <Container
-          className="mt-3 border"
+          className="mt-1 border"
           style={{
             maxHeight: "45vh",
             overflowX: "auto",
@@ -186,8 +214,12 @@ const HeroSearch = () => {
                   <SearchCoincidenceCard
                     heroName={result.name}
                     imgSrc={result.image.url}
+                    alignment={result.biography?.alignment}
                     onAdd={(event) => handleAddHero(event, result)}
                     key={`${result.name}${index}`}
+                    addButtonDisabled={myTeam.some(
+                      (elem) => elem.id === result.id
+                    )}
                   />
                 </Col>
               ))}
@@ -205,6 +237,10 @@ const HeroSearch = () => {
           <Col>
             {addNotAllowed.error && (
               <p className="text-danger">{addNotAllowed.message}</p>
+            )}
+
+            {successfulAdd && (
+              <p className="text-success">Heroe agregado a tu equipo</p>
             )}
           </Col>
         </Row>
